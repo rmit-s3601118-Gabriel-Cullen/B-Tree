@@ -26,10 +26,15 @@ public class dbload implements dbimpl
    }
    
    public BPlusTree getBtree() {
+
 	   return bTree;
    }
    
 
+   public void readArguments() {
+	   readFile( "sample.csv", 4096);
+   }
+   
    // reading command line arguments
    public void readArguments(String args[])
    {
@@ -67,7 +72,7 @@ public class dbload implements dbimpl
    {
       dbload load = new dbload();
       File heapfile = new File(HEAP_FNAME + pagesize);
-      System.out.println("File saved to " + heapfile.getAbsolutePath());
+//      System.out.println("File saved to " + heapfile.getAbsolutePath());
       BufferedReader br = null;
       FileOutputStream fos = null;
       String line = "";
@@ -135,9 +140,9 @@ public class dbload implements dbimpl
             }
          }
       }
-      System.out.println("Page total: " + pageCount);
-      System.out.println("Record total: " + recCount);
-      System.out.println("device id 19879 is at " + bTree.search(19879));
+//      System.out.println("Page total: " + pageCount);
+//      System.out.println("Record total: " + recCount);
+//      System.out.println("device id 19879 is at " + bTree.search(19879));
    }
 
    // create byte array for a field and append to record array at correct 

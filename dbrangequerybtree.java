@@ -7,16 +7,17 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
-public class dbquerybtree implements dbimpl {
+public class dbrangequerybtree implements dbimpl {
 	
 	  Integer pageSize; 
 	  Integer deviceID;
+	  Integer deviceIDfinal;
 	  Integer pageCount; 
       
       BPlusTree btree;
 	  
 	public static void main(String args[]){
-		dbquerybtree query = new dbquerybtree(); 
+		dbrangequerybtree query = new dbrangequerybtree(); 
 		
 		dbload load = new dbload();
 		load.readArguments();
@@ -33,28 +34,33 @@ public class dbquerybtree implements dbimpl {
 	
 	public void readArguments(String args[])
 	   {
-		System.out.println(args.length);
-	      if (args.length == 2)
+//		System.out.println(args.length);
+	      if (args.length == 3)
 	      {
-	         if (isInteger(args[1]) && isInteger(args[0]))
+	         if (isInteger(args[1]) && isInteger(args[0]) && isInteger(args[2]))
 	         {
 	        	 deviceID = Integer.parseInt(args[0]);
 	        	 pageSize = Integer.parseInt(args[1]);
-	     		System.out.println(pageSize.toString());
+	        	 deviceIDfinal = Integer.parseInt(args[2]);
+//	     		System.out.println(pageSize.toString());
+	        	 while(deviceID < deviceIDfinal) {
+	        		 try {
+			        	 pageCount = (Integer) btree.search(deviceID);
+			        	 readHeap(deviceID, pageSize, pageCount);
+			        	 deviceID ++;
+	        		 }
+	        		 catch (NullPointerException e) {
+	        			 System.out.println("Index not found:" + deviceID);
+	        			 deviceID ++;
+	        		 }
+ 
+	        	 }
 
-	        	 pageCount = (Integer) btree.search(deviceID);
-	        	 try {
-	        	 readHeap(deviceID, pageSize, pageCount);
-	        	 }
-	        	 catch (NullPointerException e) {
-	        		 
-	        		 System.out.println("Index does not exist " + deviceID);
-	        	 }
 	         }
 	      }
 	      else
 	      {
-	          System.out.println("Error: only pass in two arguments");
+	          System.out.println("Error: only pass in three arguments");
 	      }
 	   }
 	
@@ -76,18 +82,19 @@ public class dbquerybtree implements dbimpl {
 	public void readHeap(Integer deviceID, int pagesize, int pageCount)
 	   {
 	      File heapfile = new File(HEAP_FNAME + pagesize);
-	      System.out.println(heapfile.getAbsolutePath());
+//	      System.out.println(heapfile.getAbsolutePath());
 	      int intSize = 4;
 	      int recCount = 0;
 	      int recordLen = 0;
 	      int rid = 0;
 	      boolean isNextPage = true;
 	      boolean isNextRecord = true;
+	      boolean rangeQuery = true;
 	      try
 	      {
 	         FileInputStream fis = new FileInputStream(heapfile);
 	         // reading page by page
-	         while (isNextPage)
+	         while (isNextPage && rangeQuery)
 	         {
 	            byte[] bPage = new byte[pagesize];
 	            byte[] bPageNum = new byte[intSize];
@@ -116,6 +123,8 @@ public class dbquerybtree implements dbimpl {
 	                  else
 	                  {
 	                     printRecord(bRecord, deviceID);
+
+
 	                     recordLen += RECORD_SIZE;
 	                  }
 	                  recCount++;

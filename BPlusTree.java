@@ -94,7 +94,7 @@ public class BPlusTree<K extends Comparable<? super K>, V> {
 	 *            the value to be associated with the specified key
 	 */
 	public void insert(K key, V value) {
-		System.out.println("device_id=" + key + " page=" + value);
+//		System.out.println("device_id=" + key + " page=" + value);
 		root.insertValue(key, value);
 	}
 
